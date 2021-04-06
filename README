@@ -1,0 +1,52 @@
+1. Activate DEV mode in Crankshaft. See this guide: https://github.com/opencardev/crankshaft/wiki/Dev-Mode-and-Debug-Mode
+   I used first method changing DEV_MODE=1 in /boot/crankshaft/crankshaft_env.sh mounting the microSD in my computer.
+2. Attach Ethernet cable to Raspberry/Crankshaft, boot, find out IP and login through SSH (user: pi; pwd: raspberry).
+3. Update distribution and install some packages:
+
+$ sudo apt-get update
+$ sudo apt-get upgrade
+$ sudo apt-get install -y libboost-all-dev libusb-1.0.0-dev cmake libprotobuf-dev protobuf-c-compiler protobuf-compiler librtaudio-dev
+
+4. Download 'development' branch of xblack86's aasdk fork:
+
+$ cd ~
+$ git clone -b development https://github.com/xblack86/aasdk.git
+
+
+$ cd aasdk
+
+5. Compile aasdk:
+
+$ cd ~
+$ mkdir aasdk_build
+$ cd aasdk_build
+$ cmake -DCMAKE_BUILD_TYPE=Release ../aasdk
+$ make
+
+6. Install some packages to compile ilclient:
+
+$ sudo apt-get install -y libraspberrypi-doc libraspberrypi-dev
+$ cd /opt/vc/src/hello_pi/libs/ilclient
+$ make
+
+7. Download 'crankshaft-ng' branch of abraha2d's openauto fork:
+
+$ cd ~
+$ git clone -b crankshaft-ng https://github.com/xblack86/openauto.git
+
+$ cd openauto
+
+8. Compile openauto:
+
+$ cd ~
+$ mkdir openauto_build
+$ cd openauto_build
+$ sudo apt-get install -y libtag1-dev libblkid-dev
+$ cmake -DCMAKE_BUILD_TYPE=Release -DRPI3_BUILD=TRUE -DAASDK_INCLUDE_DIRS="/home/pi/aasdk/include" -DAASDK_LIBRARIES="/home/pi/aasdk/lib/libaasdk.so" -DAASDK_PROTO_INCLUDE_DIRS="/home/pi/aasdk_build" -DAASDK_PROTO_LIBRARIES="/home/pi/aasdk/lib/libaasdk_proto.so" ../openauto
+$ make
+
+9. Replace binary in Crankshaft:
+
+$ sudo cp /home/pi/openauto/bin/autoapp /usr/local/bin/autoapp
+
+12. Revert DEV mode change from step 1 and boot normally.
